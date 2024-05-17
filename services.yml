@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: data-platform-nestjs-rmq-message-request-insert-to-mongodb
+  name: data-platform-nestjs-rmq-message-request-insert-to-mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: data-platform-nestjs-rmq-message-request-insert-to-mongodb
+      app: NESTJS_RMQ_MESSAGE_REQUEST_INSERT_TO_MONGODB
+  template:
+    metadata:
+      labels:
+        run: data-platform-nestjs-rmq-message-request-insert-to-mongodb
+        app: NESTJS_RMQ_MESSAGE_REQUEST_INSERT_TO_MONGODB
+    spec:
+      hostname: data-platform-nestjs-rmq-message-request-insert-to-mongodb
+      containers:
+        - name: data-platform-nestjs-rmq-message-request-insert-to-mongodb
+          image: latonaio/data-platform-nestjs-rmq-message-request-insert-to-mongodb
+          imagePullPolicy: Always
+          env:
+            - name: "MONGO_DB_NAME"
+              value: "DataPlatform"
+            - name: "MONGO_DB_COLLECTION_NAME"
+              value: "RequestData"
+            - name: "MONGO_DB_ADDRESS"
+              value: "mongo-log"
+            - name: "MONGO_DB_PORT"
+              value: "27017"
+          envFrom:
+            - configMapRef:
+                name: env-config
+            - secretRef:
+                name: env-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: data-platform-nestjs-rmq-message-request-insert-to-mongodb
+  name: data-platform-nestjs-rmq-message-request-insert-to-mongodb
+spec:
+  selector:
+    run: data-platform-nestjs-rmq-message-request-insert-to-mongodb
+  type: ClusterIP
+  ports:
+    - name: api
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
